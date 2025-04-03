@@ -1,0 +1,50 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Run tp3_in_string_test.py
+      id: run-tp3_in_string_test-py
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Run tp3_in_string_test.py
+        setup-command: pip install pytest
+        command: pytest tp3_in_string_test.py
+        timeout: 10
+        max-score: 1
+    - name: Run tp3_slice_advanced_test.py
+      id: run-tp3_slice_advanced_test-py
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Run tp3_slice_advanced_test.py
+        setup-command: pip install pytest
+        command: pytest tp3_slice_advanced_test.py
+        timeout: 10
+        max-score: 1
+    - name: Run tp3_slice_simple_test.py
+      id: run-tp3_slice_simple_test-py
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Run tp3_slice_simple_test.py
+        setup-command: pip install pytest
+        command: pytest tp3_slice_simple_test.py
+        timeout: 10
+        max-score: 1
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        RUN-TP3_IN_STRING_TEST-PY_RESULTS: "${{steps.run-tp3_in_string_test-py.outputs.result}}"
+        RUN-TP3_SLICE_ADVANCED_TEST-PY_RESULTS: "${{steps.run-tp3_slice_advanced_test-py.outputs.result}}"
+        RUN-TP3_SLICE_SIMPLE_TEST-PY_RESULTS: "${{steps.run-tp3_slice_simple_test-py.outputs.result}}"
+      with:
+        runners: run-tp3_in_string_test-py,run-tp3_slice_advanced_test-py,run-tp3_slice_simple_test-py
